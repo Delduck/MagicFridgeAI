@@ -1,5 +1,6 @@
 package com.github.delduck.magicfridgeai.model;
 
+import com.github.delduck.magicfridgeai.enums.Categoria;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,9 +18,14 @@ public class FoodItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String nome;
-    private String categoria;
+
+    @Enumerated(EnumType.STRING)
+    private Categoria categoria;
+
     private Integer quantidade;
+
     private LocalDate validade;
 
 }
