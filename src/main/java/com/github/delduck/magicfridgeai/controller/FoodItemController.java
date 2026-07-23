@@ -3,11 +3,11 @@ package com.github.delduck.magicfridgeai.controller;
 import com.github.delduck.magicfridgeai.model.FoodItem;
 import com.github.delduck.magicfridgeai.service.FoodItemService;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/food")
@@ -29,7 +29,8 @@ public class FoodItemController {
 
     @GetMapping("/{id}")
     public ResponseEntity<FoodItem> listID(@PathVariable Long id) {
-        return ResponseEntity.ok(foodItemService.listByID(id));
+        Optional<FoodItem> optionalFoodItem = foodItemService.listByID(id);
+        return optionalFoodItem.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
@@ -38,5 +39,15 @@ public class FoodItemController {
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<FoodItem> update(@PathVariable Long id,
+                                           @RequestBody FoodItem foodItem) {
 
+        return foodItemService.listByID(id)
+                .map(existsItem -> {
+                    foodItem.setId(existsItem.getId());
+                    FoodItem foodUpdate = foodItemService.update(foodItem);
+                    return ResponseEntity.ok(foodUpdate);
+                }).orElse(ResponseEntity.notFound().build());
+    }
 }
